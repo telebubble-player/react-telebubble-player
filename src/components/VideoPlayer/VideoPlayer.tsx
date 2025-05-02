@@ -28,7 +28,7 @@ interface Props {
   playButtonAriaLabelPause?: string;
 }
 
-export const VideoPlayer = memo<Props>(({
+const VideoPlayer = memo<Props>(({
   className,
   src,
   size = 300,

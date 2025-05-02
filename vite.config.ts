@@ -1,23 +1,27 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path'
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import { libInjectCss } from 'vite-plugin-lib-inject-css'
+import dts from 'vite-plugin-dts';
+
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    libInjectCss(),
+    dts({
+      tsconfigPath: resolve(__dirname, 'tsconfig.build.json'),
+    }),
+  ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'), // or your entry file
-      name: 'ReactTelebubblePlayer',
-      fileName: (format) => `react-telebubble-player.${format}.js`,
+      entry: resolve(__dirname, 'src/index.ts'),
+      formats: ['es'],
+      fileName: () => 'index.js',
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
-    },
+      external: ['react', 'react/jsx-runtime'],
+      
+    }
   },
 });
