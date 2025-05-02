@@ -2,6 +2,8 @@
 
 A customizable, accessible, and modern circular video player React component. Built with TypeScript and SCSS modules, this library is designed for easy integration and flexible styling in your React projects.
 
+[![NPM version](https://badge.fury.io/js/react-telebubble-player.svg)](http://badge.fury.io/js/react-telebubble-player)
+
 ---
 
 ## Features
