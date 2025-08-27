@@ -4,14 +4,25 @@ A customizable, accessible, and modern circular video player React component. Bu
 
 [![NPM version](https://badge.fury.io/js/react-telebubble-player.svg)](http://badge.fury.io/js/react-telebubble-player)
 
+## 🎉 What's New in v0.4.0
+
+- **🎯 Fixed progress bar for percentage sizes** - Now works perfectly with 100%, 50%, etc.
+- **📱 Smart click tolerance** - New `progressClickTolerance` prop (default 5%) optimized for smaller players
+- **🫥 Icon hiding support** - Set `playIcon="none"` or `pauseIcon="none"` to hide icons completely
+- **👆 Click anywhere to play** - Click anywhere on the player to play/pause with smart conflict detection
+- **🎨 Enhanced custom pause icons** - Full support for custom pause icons with comprehensive examples
+
 ---
 
 ## Features
-- Circular video progress ring with interactive seeking
-- Play/pause button with keyboard and mouse support
-- **Custom play/pause icons** - Replace default icons with your own designs
+- **Circular video progress ring** with interactive seeking and proportional click tolerance
+- **Click anywhere to play** - Click anywhere on the player to play/pause (smart detection prevents conflicts)
+- **Custom play/pause icons** - Replace default icons with your own designs or hide them completely
+- **Icon hiding support** - Set icons to `"none"` to hide them completely (no gray circles!)
 - **Custom play buttons** - Complete control over play button appearance and behavior
 - **State-based styling** - Different styles for play vs pause states
+- **Progress click tolerance** - Control how much area around the progress ring is clickable
+- **Responsive sizing** - Works perfectly with percentage-based sizes (100%, 50%, etc.)
 - Customizable via props and class names
 - Thumbnail support with smooth transitions
 - Fully accessible (ARIA labels, keyboard navigation)
@@ -137,6 +148,67 @@ export default function App() {
 }
 ```
 
+### Hidden Icons
+
+You can hide play or pause icons completely by setting them to `"none"`:
+
+```tsx
+// Hide only the play icon (shows pause icon when playing)
+<VideoPlayer
+  src="/video.mp4"
+  playIcon="none"
+  pauseIcon={customPauseIcon}
+/>
+
+// Hide only the pause icon (shows play icon when paused)
+<VideoPlayer
+  src="/video.mp4" 
+  playIcon={customPlayIcon}
+  pauseIcon="none"
+/>
+
+// Hide both icons completely (clean, minimal look)
+<VideoPlayer
+  src="/video.mp4"
+  playIcon="none"
+  pauseIcon="none"
+/>
+```
+
+### Progress Click Tolerance
+
+Control how much area around the progress ring is clickable for seeking vs clicking to play/pause:
+
+```tsx
+// Tight tolerance (5% - default, optimized for smaller players)
+<VideoPlayer src="/video.mp4" progressClickTolerance={5} />
+
+// Medium tolerance (15% - good balance)
+<VideoPlayer src="/video.mp4" progressClickTolerance={15} />
+
+// Generous tolerance (30% - easier seeking, less play/pause area)
+<VideoPlayer src="/video.mp4" progressClickTolerance={30} />
+```
+
+**How it works:**
+- **Progress ring area** (within tolerance %) → Seeks to that position
+- **Anywhere else** → Toggles play/pause
+- **Play/pause button** → Always toggles play/pause (isolated from other interactions)
+
+### Click Anywhere to Play
+
+The player now supports clicking anywhere to play/pause, with smart detection:
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  // Click anywhere on the player to play/pause
+  // Click on progress ring to seek 
+  // Click on play/pause button for guaranteed play/pause
+  progressClickTolerance={5} // Adjust balance between seeking vs play/pause
+/>
+```
+
 ---
 
 ## Props
@@ -154,8 +226,9 @@ export default function App() {
 | `videoClassName`          | string              | -                 | Custom class for the video element               |
 | `thumbnailClassName`      | string              | -                 | Custom class for the thumbnail                   |
 | `playButtonClassName`     | string              | -                 | Custom class for the default play button         |
-| `playIcon`                | React.ReactNode     | -                 | Custom play icon (replaces default triangle)     |
-| `pauseIcon`               | React.ReactNode     | -                 | Custom pause icon (replaces default bars)        |
+| `playIcon`                | React.ReactNode \| "none" | -          | Custom play icon (replaces default triangle) or "none" to hide |
+| `pauseIcon`               | React.ReactNode \| "none" | -          | Custom pause icon (replaces default bars) or "none" to hide |
+| `progressClickTolerance`  | number              | 5                 | Percentage of radius for progress ring click tolerance (5-30 recommended) |
 | `customPlayButton`        | function            | -                 | Complete custom play button component            |
 | `customPlayButtonClassName` | string            | -                 | Custom class for custom play button              |
 | `onPlayClassName`         | string              | -                 | Class applied when video is playing              |
@@ -178,9 +251,11 @@ npm run dev
 ```
 
 This will start a development server with examples of:
-- Basic video player
-- Custom play/pause icons (triangle, heart, star)
-- Different player sizes
+- Basic video player with click-anywhere-to-play
+- Custom play & pause icons (triangle, heart, star with matching pause styles)
+- Hidden icons examples ("none" value demonstrations)
+- Progress click tolerance demonstrations (5%, 15%, 30%)
+- Different player sizes (120px, 200px, 50%)
 - Players with and without thumbnails
 
 ### Build for Production (Library Mode)
