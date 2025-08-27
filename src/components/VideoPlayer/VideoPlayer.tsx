@@ -26,8 +26,8 @@ interface Props {
   thumbnailAlt?: string;
   playButtonAriaLabelPlay?: string;
   playButtonAriaLabelPause?: string;
-  playIcon?: React.ReactNode;
-  pauseIcon?: React.ReactNode;
+  playIcon?: React.ReactNode | "none";
+  pauseIcon?: React.ReactNode | "none";
   customPlayButton?: (props: {
     isPlaying: boolean;
     onClick: () => void;
@@ -40,6 +40,7 @@ interface Props {
   customPlayButtonClassName?: string;
   onPlayClassName?: string;
   onPauseClassName?: string;
+  progressClickTolerance?: number; // Percentage of radius for click tolerance (default: 5%)
 }
 
 const VideoPlayer = memo<Props>(({
@@ -64,6 +65,7 @@ const VideoPlayer = memo<Props>(({
   customPlayButtonClassName,
   onPlayClassName,
   onPauseClassName,
+  progressClickTolerance = 5,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -100,12 +102,19 @@ const VideoPlayer = memo<Props>(({
       // calculate distance from center
       const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
 
-      // check if click was on or near the ring
-      const tolerance = 10; // pixels
-      const targetRadius = svgParams.normalizedRadius;
-      return Math.abs(distance - targetRadius) <= tolerance;
+      // Use the actual rendered size instead of the fallback numeric size
+      const actualRadius = Math.min(rect.width, rect.height) / 2;
+      const strokeWidth = 4;
+      const normalizedRadius = actualRadius - strokeWidth;
+
+      // Use proportional buffer based on progressClickTolerance (percentage of radius)
+      const buffer = (normalizedRadius * progressClickTolerance) / 100;
+      const maxRadius = normalizedRadius + buffer;
+      const minRadius = Math.max(0, normalizedRadius - buffer);
+
+      return distance >= minRadius && distance <= maxRadius;
     },
-    [svgParams.normalizedRadius],
+    [progressClickTolerance],
   );
 
   const calculateProgress = useCallback(
@@ -147,13 +156,14 @@ const VideoPlayer = memo<Props>(({
 
   const handleSeekStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-
       const newProgress = calculateProgress(e.nativeEvent);
 
       // ignore if click/drag is outside the ring
       if (newProgress === null) return;
+
+      // Only prevent default behavior if we're actually handling the event
+      e.stopPropagation();
+      e.preventDefault();
 
       isDraggingRef.current = true;
       const wasPlaying = isPlaying;
@@ -236,6 +246,21 @@ const VideoPlayer = memo<Props>(({
     setIsPlaying((prev) => !prev);
   }, [isPlaying]);
 
+  const handleContainerClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Don't toggle play if we're interacting with progress circle
+      const newProgress = calculateProgress(e.nativeEvent);
+      if (newProgress !== null) {
+        // Click was on progress circle, let handleSeekStart handle it
+        return;
+      }
+
+      // Click was anywhere else in the container, toggle play/pause
+      togglePlay();
+    },
+    [calculateProgress, togglePlay],
+  );
+
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -260,6 +285,7 @@ const VideoPlayer = memo<Props>(({
         "--size": typeof size === 'number' ? `${size}px` : size,
         "--min-size": `${Math.max(120, numericSize / 2)}px`,
       } as React.CSSProperties}
+      onClick={handleContainerClick}
     >
       <svg
         className={clsx(styles.progressRing, progressRingClassName)}
@@ -301,7 +327,6 @@ const VideoPlayer = memo<Props>(({
           className={clsx(styles.video, videoClassName)}
           src={src}
           playsInline
-          onClick={togglePlay}
           onKeyDown={handleKeyPress}
           tabIndex={0}
           aria-label={videoAriaLabel}
@@ -319,40 +344,51 @@ const VideoPlayer = memo<Props>(({
           onPauseClassName,
         })
       ) : (
-        <button
-          className={clsx(styles.playButton, playButtonClassName)}
-          onClick={togglePlay}
-          onKeyDown={handleKeyPress}
-          type="button"
-          aria-label={isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
-        >
-          {isPlaying ? (
-            pauseIcon || (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <rect x="6" y="4" width="4" height="16" rx="1" fill="white" />
-                <rect x="14" y="4" width="4" height="16" rx="1" fill="white" />
-              </svg>
-            )
-          ) : (
-            playIcon || (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path d="M8 5v14l11-7z" fill="white" />
-              </svg>
-            )
-          )}
-        </button>
+        // Only render button if current state has an icon to show
+        (() => {
+          const currentIcon = isPlaying ? pauseIcon : playIcon;
+          const hasCurrentIcon = currentIcon !== "none";
+
+          return hasCurrentIcon && (
+            <button
+              className={clsx(styles.playButton, playButtonClassName)}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent container click handler
+                togglePlay();
+              }}
+              onKeyDown={handleKeyPress}
+              type="button"
+              aria-label={isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
+            >
+              {isPlaying ? (
+                pauseIcon || (
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <rect x="6" y="4" width="4" height="16" rx="1" fill="white" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" fill="white" />
+                  </svg>
+                )
+              ) : (
+                playIcon || (
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 5v14l11-7z" fill="white" />
+                  </svg>
+                )
+              )}
+            </button>
+          );
+        })()
       )}
     </div>
   );

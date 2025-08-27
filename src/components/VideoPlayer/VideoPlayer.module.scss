@@ -12,6 +12,7 @@
   min-height: var(--min-size, 120px);
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
 
   .progressRing {
     opacity: 0.7;

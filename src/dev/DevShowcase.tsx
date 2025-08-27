@@ -28,6 +28,28 @@ const DevShowcase: React.FC = () => {
     </svg>
   );
 
+  // Custom pause icon examples
+  const customPauseIcon2 = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="5" y="3" width="5" height="18" fill="white" rx="2.5" />
+      <rect x="14" y="3" width="5" height="18" fill="white" rx="2.5" />
+    </svg>
+  );
+
+  const heartPauseIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="8" y="6" width="2" height="12" fill="white" rx="1" />
+      <rect x="14" y="6" width="2" height="12" fill="white" rx="1" />
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="white" strokeWidth="1.5" fill="none" />
+    </svg>
+  );
+
+  const stopPauseIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="6" y="6" width="12" height="12" fill="white" rx="2" />
+    </svg>
+  );
+
   // Sample video URL (you can replace with any video URL)
   const sampleVideoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
   const sampleThumbnail = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg";
@@ -42,7 +64,7 @@ const DevShowcase: React.FC = () => {
       <main className="showcase-content">
         <section className="showcase-section">
           <h2>Default Player</h2>
-          <p>Basic VideoPlayer with default settings (100% size, responsive)</p>
+          <p>Basic VideoPlayer with default settings (100% size, responsive). Click anywhere on the player to play/pause, or drag the progress ring to seek!</p>
           <div className="player-container">
             <VideoPlayer
               src={sampleVideoUrl}
@@ -52,45 +74,136 @@ const DevShowcase: React.FC = () => {
         </section>
 
         <section className="showcase-section">
-          <h2>Custom Play Icons & Buttons</h2>
-          <p>VideoPlayer with custom play/pause button icons and completely custom play button designs</p>
+          <h2>Custom Play & Pause Icons</h2>
+          <p>VideoPlayer with custom play/pause button icons - click play and then pause to see both custom icons</p>
 
           <div className="custom-icons-grid">
             <div className="player-demo">
-              <h3>Custom Triangle Play Icon</h3>
+              <h3>Custom Triangle & Rounded Pause</h3>
               <div className="player-container">
                 <VideoPlayer
                   src={sampleVideoUrl}
                   thumbnailSrc={sampleThumbnail}
                   size={180}
                   playIcon={customPlayIcon}
-                  pauseIcon={customPauseIcon}
+                  pauseIcon={customPauseIcon2}
                 />
               </div>
             </div>
 
             <div className="player-demo">
-              <h3>Heart Play Icon</h3>
+              <h3>Heart Play & Heart-Frame Pause</h3>
               <div className="player-container">
                 <VideoPlayer
                   src={sampleVideoUrl}
                   thumbnailSrc={sampleThumbnail}
                   size={180}
                   playIcon={heartPlayIcon}
-                  pauseIcon={customPauseIcon}
+                  pauseIcon={heartPauseIcon}
                 />
               </div>
             </div>
 
             <div className="player-demo">
-              <h3>Star Play Icon</h3>
+              <h3>Star Play & Stop Pause</h3>
               <div className="player-container">
                 <VideoPlayer
                   src={sampleVideoUrl}
                   thumbnailSrc={sampleThumbnail}
                   size={180}
                   playIcon={starPlayIcon}
+                  pauseIcon={stopPauseIcon}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="showcase-section">
+          <h2>Hidden Icons ("none" value)</h2>
+          <p>VideoPlayer with hidden play/pause icons - set playIcon or pauseIcon to "none" to hide them completely. Click anywhere on the player to play/pause!</p>
+
+          <div className="custom-icons-grid">
+            <div className="player-demo">
+              <h3>No Play Icon</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon="none"
                   pauseIcon={customPauseIcon}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>No Pause Icon</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={heartPlayIcon}
+                  pauseIcon="none"
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>No Icons At All</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon="none"
+                  pauseIcon="none"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="showcase-section">
+          <h2>Progress Click Tolerance</h2>
+          <p>Control how much area around the progress ring is clickable for seeking (vs clicking to play/pause)</p>
+          <div className="custom-icons-grid">
+            <div className="player-demo">
+              <h3>Default (5% tolerance)</h3>
+              <p>Optimized for smaller players</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  progressClickTolerance={5}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Medium (15% tolerance)</h3>
+              <p>Balanced click area</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  progressClickTolerance={15}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Generous (30% tolerance)</h3>
+              <p>Large click area for seeking</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  progressClickTolerance={30}
                 />
               </div>
             </div>
