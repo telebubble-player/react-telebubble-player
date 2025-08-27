@@ -50,6 +50,46 @@ const DevShowcase: React.FC = () => {
     </svg>
   );
 
+  // Additional custom play icons
+  const circlePlayIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" fill="none" />
+      <polygon points="10,8 16,12 10,16" fill="white" />
+    </svg>
+  );
+
+  const arrowPlayIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M8 5l11 7-11 7V5z" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  );
+
+  const diamondPlayIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2l4 4v4l4 2-4 2v4l-4 4-4-4v-4l-4-2 4-2V6l4-4z" fill="white" />
+      <polygon points="10,9 15,12 10,15" fill="#333" />
+    </svg>
+  );
+
+  const squarePlayIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="4" width="16" height="16" fill="white" rx="3" />
+      <polygon points="10,8 16,12 10,16" fill="#333" />
+    </svg>
+  );
+
+  const gradientPlayIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id="playGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ff6b6b" />
+          <stop offset="100%" stopColor="#4ecdc4" />
+        </linearGradient>
+      </defs>
+      <polygon points="6,4 20,12 6,20" fill="url(#playGradient1)" />
+    </svg>
+  );
+
   // Sample video URL (you can replace with any video URL)
   const sampleVideoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
   const sampleThumbnail = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg";
@@ -113,6 +153,167 @@ const DevShowcase: React.FC = () => {
                   size={180}
                   playIcon={starPlayIcon}
                   pauseIcon={stopPauseIcon}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="showcase-section">
+          <h2>More Custom Play Icons</h2>
+          <p>Creative custom play icon designs - from minimalist to complex gradients</p>
+
+          <div className="custom-icons-grid">
+            <div className="player-demo">
+              <h3>Circle Outline</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={circlePlayIcon}
+                  pauseIcon={customPauseIcon}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Arrow Style</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={arrowPlayIcon}
+                  pauseIcon={customPauseIcon2}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Diamond Shape</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={diamondPlayIcon}
+                  pauseIcon={heartPauseIcon}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Square Frame</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={squarePlayIcon}
+                  pauseIcon={stopPauseIcon}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Gradient</h3>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={gradientPlayIcon}
+                  pauseIcon={customPauseIcon2}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Mix & Match</h3>
+              <p>Circle play + Heart pause</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playIcon={circlePlayIcon}
+                  pauseIcon={heartPauseIcon}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="showcase-section">
+          <h2>Custom Play Button</h2>
+          <p>Custom play button with hiding behavior - hides when pauseIcon is set to "none"</p>
+          <div className="custom-icons-grid">
+            <div className="player-demo">
+              <h3>Custom Button - Hides When Playing</h3>
+              <p>Custom play button that disappears when playing (pauseIcon="none")</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  pauseIcon="none"
+                  customPlayButton={({ isPlaying, onClick, onKeyDown, ariaLabel }) => (
+                    <button
+                      onClick={onClick}
+                      onKeyDown={onKeyDown}
+                      aria-label={ariaLabel}
+                      style={{
+                        position: 'absolute',
+                        zIndex: 3,
+                        background: 'rgba(0, 150, 255, 0.8)',
+                        border: '2px solid white',
+                        borderRadius: '12px',
+                        width: '80px',
+                        height: '40px',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {isPlaying ? '⏸️ PAUSE' : '▶️ PLAY'}
+                    </button>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>Custom Button - Always Visible</h3>
+              <p>Custom play button that changes between play/pause</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  customPlayButton={({ isPlaying, onClick, onKeyDown, ariaLabel }) => (
+                    <button
+                      onClick={onClick}
+                      onKeyDown={onKeyDown}
+                      aria-label={ariaLabel}
+                      style={{
+                        position: 'absolute',
+                        zIndex: 3,
+                        background: isPlaying ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 255, 0, 0.8)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '60px',
+                        height: '60px',
+                        color: 'white',
+                        fontSize: '20px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {isPlaying ? '⏸️' : '▶️'}
+                    </button>
+                  )}
                 />
               </div>
             </div>

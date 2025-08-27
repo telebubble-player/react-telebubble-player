@@ -30,7 +30,7 @@ interface Props {
   pauseIcon?: React.ReactNode | "none";
   customPlayButton?: (props: {
     isPlaying: boolean;
-    onClick: () => void;
+    onClick: (e?: React.MouseEvent) => void;
     onKeyDown: (e: KeyboardEvent) => void;
     ariaLabel: string;
     className?: string;
@@ -334,15 +334,24 @@ const VideoPlayer = memo<Props>(({
         </video>
       </div>
       {customPlayButton ? (
-        customPlayButton({
-          isPlaying,
-          onClick: togglePlay,
-          onKeyDown: handleKeyPress,
-          ariaLabel: isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay,
-          className: customPlayButtonClassName,
-          onPlayClassName,
-          onPauseClassName,
-        })
+        // Only render custom button if current state has an icon to show
+        (() => {
+          const currentIcon = isPlaying ? pauseIcon : playIcon;
+          const hasCurrentIcon = currentIcon !== "none";
+
+          return hasCurrentIcon && customPlayButton({
+            isPlaying,
+            onClick: (e?: React.MouseEvent) => {
+              e?.stopPropagation(); // Prevent container click handler
+              togglePlay();
+            },
+            onKeyDown: handleKeyPress,
+            ariaLabel: isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay,
+            className: customPlayButtonClassName,
+            onPlayClassName,
+            onPauseClassName,
+          });
+        })()
       ) : (
         // Only render button if current state has an icon to show
         (() => {
