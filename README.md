@@ -4,6 +4,16 @@ A customizable, accessible, and modern circular video player React component. Bu
 
 [![NPM version](https://badge.fury.io/js/react-telebubble-player.svg)](http://badge.fury.io/js/react-telebubble-player)
 
+## ⚠️ Experimental Project Notice
+
+**This project is vibe-coded for fun, lulz, and a few personal projects!** 🎉
+
+While it works and has some cool features, **it's not recommended for production applications** as it hasn't been thoroughly tested across all edge cases and environments. This is more of a creative experiment and learning project.
+
+**If you find bugs or issues**, please let me know! I'd appreciate the feedback and will do my best to fix them when I have time.
+
+**Use at your own risk** - but feel free to fork, modify, and make it your own! 🚀
+
 ## 🎉 What's New in v0.4.0
 
 - **🎯 Fixed progress bar for percentage sizes** - Now works perfectly with 100%, 50%, etc.
