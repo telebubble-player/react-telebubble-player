@@ -13,7 +13,7 @@ import styles from "./VideoPlayer.module.scss";
 interface Props {
   className?: string;
   src: string;
-  size?: number;
+  size?: number | string;
   thumbnailSrc?: string;
   containerClassName?: string;
   progressRingClassName?: string;
@@ -26,12 +26,26 @@ interface Props {
   thumbnailAlt?: string;
   playButtonAriaLabelPlay?: string;
   playButtonAriaLabelPause?: string;
+  playIcon?: React.ReactNode;
+  pauseIcon?: React.ReactNode;
+  customPlayButton?: (props: {
+    isPlaying: boolean;
+    onClick: () => void;
+    onKeyDown: (e: KeyboardEvent) => void;
+    ariaLabel: string;
+    className?: string;
+    onPlayClassName?: string;
+    onPauseClassName?: string;
+  }) => React.ReactNode;
+  customPlayButtonClassName?: string;
+  onPlayClassName?: string;
+  onPauseClassName?: string;
 }
 
 const VideoPlayer = memo<Props>(({
   className,
   src,
-  size = 300,
+  size = "100%",
   thumbnailSrc,
   containerClassName,
   progressRingClassName,
@@ -44,6 +58,12 @@ const VideoPlayer = memo<Props>(({
   thumbnailAlt = "Video thumbnail",
   playButtonAriaLabelPlay = "Play",
   playButtonAriaLabelPause = "Pause",
+  playIcon,
+  pauseIcon,
+  customPlayButton,
+  customPlayButtonClassName,
+  onPlayClassName,
+  onPauseClassName,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -52,9 +72,14 @@ const VideoPlayer = memo<Props>(({
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
+  // Get numeric size for calculations, defaulting to 300 if size is a string
+  const numericSize = useMemo(() => {
+    return typeof size === 'number' ? size : 300;
+  }, [size]);
+
   // calculation of the progress circle size for SVG
   const svgParams = useMemo(() => {
-    const radius = size / 2;
+    const radius = numericSize / 2;
     const circumference = 2 * Math.PI * radius;
     const strokeWidth = 4;
     const normalizedRadius = radius - strokeWidth;
@@ -65,7 +90,7 @@ const VideoPlayer = memo<Props>(({
       strokeWidth,
       normalizedRadius,
     };
-  }, [size]);
+  }, [numericSize]);
 
   const isClickNearCircle = useCallback(
     (x: number, y: number, rect: DOMRect) => {
@@ -232,15 +257,15 @@ const VideoPlayer = memo<Props>(({
       ref={containerRef}
       className={classNames}
       style={{
-        "--size": `${size}px`,
-        "--min-size": `${Math.max(120, size / 2)}px`,
+        "--size": typeof size === 'number' ? `${size}px` : size,
+        "--min-size": `${Math.max(120, numericSize / 2)}px`,
       } as React.CSSProperties}
     >
       <svg
         className={clsx(styles.progressRing, progressRingClassName)}
         width="100%"
         height="100%"
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`0 0 ${numericSize} ${numericSize}`}
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
         onMouseDown={handleSeekStart}
@@ -283,36 +308,52 @@ const VideoPlayer = memo<Props>(({
         >
         </video>
       </div>
-      <button
-        className={clsx(styles.playButton, playButtonClassName)}
-        onClick={togglePlay}
-        onKeyDown={handleKeyPress}
-        type="button"
-        aria-label={isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
-      >
-        {isPlaying ? (
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <rect x="6" y="4" width="4" height="16" rx="1" fill="white" />
-            <rect x="14" y="4" width="4" height="16" rx="1" fill="white" />
-          </svg>
-        ) : (
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path d="M8 5v14l11-7z" fill="white" />
-          </svg>
-        )}
-      </button>
+      {customPlayButton ? (
+        customPlayButton({
+          isPlaying,
+          onClick: togglePlay,
+          onKeyDown: handleKeyPress,
+          ariaLabel: isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay,
+          className: customPlayButtonClassName,
+          onPlayClassName,
+          onPauseClassName,
+        })
+      ) : (
+        <button
+          className={clsx(styles.playButton, playButtonClassName)}
+          onClick={togglePlay}
+          onKeyDown={handleKeyPress}
+          type="button"
+          aria-label={isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
+        >
+          {isPlaying ? (
+            pauseIcon || (
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <rect x="6" y="4" width="4" height="16" rx="1" fill="white" />
+                <rect x="14" y="4" width="4" height="16" rx="1" fill="white" />
+              </svg>
+            )
+          ) : (
+            playIcon || (
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M8 5v14l11-7z" fill="white" />
+              </svg>
+            )
+          )}
+        </button>
+      )}
     </div>
   );
 });

@@ -1,0 +1,15 @@
+# Development showcase files
+src/dev/
+index.html
+
+# Config files
+vite.config.ts
+tsconfig.*.json
+eslint.config.js
+
+# Development dependencies and temporary files
+node_modules/
+.vscode/
+.idea/
+*.log
+.DS_Store
