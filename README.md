@@ -14,6 +14,13 @@ While it works and has some cool features, **it's not recommended for production
 
 **Use at your own risk** - but feel free to fork, modify, and make it your own! 🚀
 
+## 🎉 What's New in v0.5.0
+
+- **🎮 External State Management** - New `playing` prop for external control of play/pause state
+- **📞 State Change Callbacks** - `onPlay`, `onPause`, and `onEnded` callbacks for state synchronization
+- **🔄 Bidirectional Control** - Control video from outside while maintaining internal state sync
+- **🧹 Clean Integration** - Eliminates need for DOM manipulation and complex event listeners
+
 ## 🎉 What's New in v0.4.0
 
 - **🎯 Fixed progress bar for percentage sizes** - Now works perfectly with 100%, 50%, etc.
@@ -25,6 +32,8 @@ While it works and has some cool features, **it's not recommended for production
 ---
 
 ## Features
+- **🎮 External State Management** - Control play/pause state from outside the component with `playing` prop
+- **📞 State Change Callbacks** - `onPlay`, `onPause`, and `onEnded` callbacks for state synchronization
 - **Circular video progress ring** with interactive seeking and proportional click tolerance
 - **Click anywhere to play** - Click anywhere on the player to play/pause (smart detection prevents conflicts)
 - **Custom play/pause icons** - Replace default icons with your own designs or hide them completely
@@ -219,6 +228,97 @@ The player now supports clicking anywhere to play/pause, with smart detection:
 />
 ```
 
+### External State Management
+
+Control the video player from outside the component with the new `playing` prop and state change callbacks:
+
+```tsx
+import { VideoPlayer } from 'react-telebubble-player';
+import { useState } from 'react';
+
+function MyComponent() {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <div>
+      {/* External control buttons */}
+      <button onClick={() => setIsPlaying(true)}>Play</button>
+      <button onClick={() => setIsPlaying(false)}>Pause</button>
+      
+      <VideoPlayer
+        src="/video.mp4"
+        playing={isPlaying}  // External control
+        onPlay={() => {
+          console.log('Video started playing');
+          setIsPlaying(true);
+        }}
+        onPause={() => {
+          console.log('Video paused');
+          setIsPlaying(false);
+        }}
+        onEnded={() => {
+          console.log('Video ended');
+          setIsPlaying(false);
+        }}
+      />
+    </div>
+  );
+}
+```
+
+#### Advanced State Management Integration
+
+Perfect for integration with state management libraries:
+
+```tsx
+// With Redux/Zustand/Context
+function VideoWithStateManagement() {
+  const { isPlaying, setPlaying } = useVideoStore(); // Your state management
+  
+  return (
+    <VideoPlayer
+      src="/video.mp4"
+      playing={isPlaying}
+      onPlay={() => setPlaying(true)}
+      onPause={() => setPlaying(false)}
+      onEnded={() => setPlaying(false)}
+    />
+  );
+}
+
+// With multiple players (synchronized)
+function SynchronizedPlayers() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  return (
+    <div>
+      <VideoPlayer
+        src="/video1.mp4"
+        playing={isPlaying}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+      />
+      <VideoPlayer
+        src="/video2.mp4"
+        playing={isPlaying}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+      />
+    </div>
+  );
+}
+```
+
+#### Benefits of External State Management
+
+- **🧹 Clean Integration**: No more DOM manipulation or complex event listeners
+- **🔄 Bidirectional Control**: Control from outside while maintaining internal state sync
+- **📊 State Synchronization**: Perfect for dashboards, analytics, and complex UIs
+- **⚡ Better Performance**: Optimized state management with proper error handling
+- **🎯 Predictable Behavior**: External state is the single source of truth
+
 ---
 
 ## Props
@@ -247,6 +347,11 @@ The player now supports clicking anywhere to play/pause, with smart detection:
 | `thumbnailAlt`            | string              | "Video thumbnail" | Alt text for the thumbnail image                 |
 | `playButtonAriaLabelPlay` | string              | "Play"            | ARIA label for play button (when paused)         |
 | `playButtonAriaLabelPause`| string              | "Pause"           | ARIA label for play button (when playing)        |
+| **External State Management** | | | |
+| `playing`                 | boolean             | -                 | External control of play/pause state             |
+| `onPlay`                  | () => void          | -                 | Called when video starts playing                 |
+| `onPause`                 | () => void          | -                 | Called when video is paused                      |
+| `onEnded`                 | () => void          | -                 | Called when video ends                           |
 
 ---
 

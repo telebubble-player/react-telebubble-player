@@ -41,6 +41,11 @@ interface Props {
   onPlayClassName?: string;
   onPauseClassName?: string;
   progressClickTolerance?: number; // Percentage of radius for click tolerance (default: 5%)
+  // External state management props
+  playing?: boolean; // External control of play/pause state
+  onPlay?: () => void; // Called when video starts playing
+  onPause?: () => void; // Called when video is paused
+  onEnded?: () => void; // Called when video ends
 }
 
 const VideoPlayer = memo<Props>(({
@@ -66,6 +71,11 @@ const VideoPlayer = memo<Props>(({
   onPlayClassName,
   onPauseClassName,
   progressClickTolerance = 5,
+  // External state management props
+  playing,
+  onPlay,
+  onPause,
+  onEnded,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -192,7 +202,10 @@ const VideoPlayer = memo<Props>(({
 
         isDraggingRef.current = false;
         if (wasPlaying) {
-          videoRef.current?.play();
+          videoRef.current?.play().catch(() => {
+            // Handle play promise rejection silently
+          });
+          onPlay?.();
         }
         document.removeEventListener("mousemove", handleMove);
         document.removeEventListener("mouseup", handleEnd);
@@ -205,7 +218,7 @@ const VideoPlayer = memo<Props>(({
       document.addEventListener("touchmove", handleMove, { passive: false });
       document.addEventListener("touchend", handleEnd, { passive: false });
     },
-    [calculateProgress, isPlaying, seek],
+    [calculateProgress, isPlaying, seek, onPlay],
   );
 
   const updateProgress = useCallback(() => {
@@ -218,7 +231,8 @@ const VideoPlayer = memo<Props>(({
 
   const handleVideoEnded = useCallback(() => {
     setIsPlaying(false);
-  }, []);
+    onEnded?.();
+  }, [onEnded]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -233,18 +247,39 @@ const VideoPlayer = memo<Props>(({
     };
   }, [updateProgress, handleVideoEnded]);
 
+  // Handle external control of playing state
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || playing === undefined) return;
+
+    if (playing && !isPlaying) {
+      video.play().catch(() => {
+        // Handle play promise rejection silently
+      });
+      setIsPlaying(true);
+      setHasStarted(true);
+    } else if (!playing && isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+    }
+  }, [playing, isPlaying]);
+
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (isPlaying) {
       video.pause();
+      onPause?.();
     } else {
-      video.play();
+      video.play().catch(() => {
+        // Handle play promise rejection silently
+      });
       setHasStarted(true);
+      onPlay?.();
     }
     setIsPlaying((prev) => !prev);
-  }, [isPlaying]);
+  }, [isPlaying, onPlay, onPause]);
 
   const handleContainerClick = useCallback(
     (e: React.MouseEvent) => {
