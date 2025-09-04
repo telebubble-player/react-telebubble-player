@@ -16,10 +16,10 @@ While it works and has some cool features, **it's not recommended for production
 
 ## 🎉 What's New in v0.5.0
 
-- **🎮 External State Management** - New `playing` prop for external control of play/pause state
-- **📞 State Change Callbacks** - `onPlay`, `onPause`, and `onEnded` callbacks for state synchronization
-- **🔄 Bidirectional Control** - Control video from outside while maintaining internal state sync
-- **🧹 Clean Integration** - Eliminates need for DOM manipulation and complex event listeners
+- **🎮 External State Management** - `playing` prop for complete external control
+- **📞 State Callbacks** - `onPlay`, `onPause`, `onEnded` for state synchronization
+- **🔄 Bidirectional Control** - External state becomes single source of truth
+- **🧹 Simplified Code** - Cleaner implementation with better separation of concerns
 
 ## 🎉 What's New in v0.4.0
 
@@ -230,7 +230,7 @@ The player now supports clicking anywhere to play/pause, with smart detection:
 
 ### External State Management
 
-Control the video player from outside the component with the new `playing` prop and state change callbacks:
+Control playback from external state with the `playing` prop and callbacks:
 
 ```tsx
 import { VideoPlayer } from 'react-telebubble-player';
@@ -241,66 +241,12 @@ function MyComponent() {
 
   return (
     <div>
-      {/* External control buttons */}
-      <button onClick={() => setIsPlaying(true)}>Play</button>
-      <button onClick={() => setIsPlaying(false)}>Pause</button>
-      
+      <button onClick={() => setIsPlaying(!isPlaying)}>
+        {isPlaying ? 'Pause' : 'Play'}
+      </button>
+
       <VideoPlayer
         src="/video.mp4"
-        playing={isPlaying}  // External control
-        onPlay={() => {
-          console.log('Video started playing');
-          setIsPlaying(true);
-        }}
-        onPause={() => {
-          console.log('Video paused');
-          setIsPlaying(false);
-        }}
-        onEnded={() => {
-          console.log('Video ended');
-          setIsPlaying(false);
-        }}
-      />
-    </div>
-  );
-}
-```
-
-#### Advanced State Management Integration
-
-Perfect for integration with state management libraries:
-
-```tsx
-// With Redux/Zustand/Context
-function VideoWithStateManagement() {
-  const { isPlaying, setPlaying } = useVideoStore(); // Your state management
-  
-  return (
-    <VideoPlayer
-      src="/video.mp4"
-      playing={isPlaying}
-      onPlay={() => setPlaying(true)}
-      onPause={() => setPlaying(false)}
-      onEnded={() => setPlaying(false)}
-    />
-  );
-}
-
-// With multiple players (synchronized)
-function SynchronizedPlayers() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  
-  return (
-    <div>
-      <VideoPlayer
-        src="/video1.mp4"
-        playing={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
-      />
-      <VideoPlayer
-        src="/video2.mp4"
         playing={isPlaying}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -311,13 +257,11 @@ function SynchronizedPlayers() {
 }
 ```
 
-#### Benefits of External State Management
-
-- **🧹 Clean Integration**: No more DOM manipulation or complex event listeners
-- **🔄 Bidirectional Control**: Control from outside while maintaining internal state sync
-- **📊 State Synchronization**: Perfect for dashboards, analytics, and complex UIs
-- **⚡ Better Performance**: Optimized state management with proper error handling
-- **🎯 Predictable Behavior**: External state is the single source of truth
+**When external state is provided:**
+- Internal state is ignored
+- External `playing` prop becomes the single source of truth
+- Callbacks sync your external state with video events
+- Perfect for Redux, Zustand, Context, or any state management
 
 ---
 

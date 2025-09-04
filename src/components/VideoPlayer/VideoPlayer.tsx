@@ -84,6 +84,10 @@ const VideoPlayer = memo<Props>(({
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
+  // Use external state if provided, otherwise use internal state
+  const isUsingExternalControl = playing !== undefined;
+  const currentPlayingState = isUsingExternalControl ? playing : isPlaying;
+
   // Get numeric size for calculations, defaulting to 300 if size is a string
   const numericSize = useMemo(() => {
     return typeof size === 'number' ? size : 300;
@@ -176,7 +180,7 @@ const VideoPlayer = memo<Props>(({
       e.preventDefault();
 
       isDraggingRef.current = true;
-      const wasPlaying = isPlaying;
+      const wasPlaying = currentPlayingState;
       if (wasPlaying) {
         videoRef.current?.pause();
       }
@@ -218,7 +222,7 @@ const VideoPlayer = memo<Props>(({
       document.addEventListener("touchmove", handleMove, { passive: false });
       document.addEventListener("touchend", handleEnd, { passive: false });
     },
-    [calculateProgress, isPlaying, seek, onPlay],
+    [calculateProgress, currentPlayingState, seek, onPlay],
   );
 
   const updateProgress = useCallback(() => {
@@ -230,9 +234,9 @@ const VideoPlayer = memo<Props>(({
   }, []);
 
   const handleVideoEnded = useCallback(() => {
-    setIsPlaying(false);
+    if (!isUsingExternalControl) setIsPlaying(false);
     onEnded?.();
-  }, [onEnded]);
+  }, [isUsingExternalControl, onEnded]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -250,36 +254,32 @@ const VideoPlayer = memo<Props>(({
   // Handle external control of playing state
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || playing === undefined) return;
+    if (!video || !isUsingExternalControl) return;
 
-    if (playing && !isPlaying) {
-      video.play().catch(() => {
-        // Handle play promise rejection silently
-      });
-      setIsPlaying(true);
+    // Sync video element with external playing state
+    if (playing && video.paused) {
+      video.play().catch(() => { });
       setHasStarted(true);
-    } else if (!playing && isPlaying) {
+    } else if (!playing && !video.paused) {
       video.pause();
-      setIsPlaying(false);
     }
-  }, [playing, isPlaying]);
+  }, [playing, isUsingExternalControl]);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
+    if (currentPlayingState) {
       video.pause();
       onPause?.();
+      if (!isUsingExternalControl) setIsPlaying(false);
     } else {
-      video.play().catch(() => {
-        // Handle play promise rejection silently
-      });
+      video.play().catch(() => { });
       setHasStarted(true);
       onPlay?.();
+      if (!isUsingExternalControl) setIsPlaying(true);
     }
-    setIsPlaying((prev) => !prev);
-  }, [isPlaying, onPlay, onPause]);
+  }, [currentPlayingState, isUsingExternalControl, onPlay, onPause]);
 
   const handleContainerClick = useCallback(
     (e: React.MouseEvent) => {
@@ -352,7 +352,7 @@ const VideoPlayer = memo<Props>(({
             src={thumbnailSrc}
             alt={thumbnailAlt}
             className={clsx(styles.thumbnail, thumbnailClassName, {
-              [styles['thumbnail--hidden']]: hasStarted || isPlaying,
+              [styles['thumbnail--hidden']]: hasStarted || currentPlayingState,
             })}
             draggable={false}
           />
@@ -371,17 +371,15 @@ const VideoPlayer = memo<Props>(({
       {customPlayButton ? (
         // Only render custom button if current state has an icon to show
         (() => {
-          const currentIcon = isPlaying ? pauseIcon : playIcon;
-          const hasCurrentIcon = currentIcon !== "none";
-
-          return hasCurrentIcon && customPlayButton({
-            isPlaying,
+          const currentIcon = currentPlayingState ? pauseIcon : playIcon;
+          return currentIcon !== "none" && customPlayButton({
+            isPlaying: currentPlayingState,
             onClick: (e?: React.MouseEvent) => {
-              e?.stopPropagation(); // Prevent container click handler
+              e?.stopPropagation();
               togglePlay();
             },
             onKeyDown: handleKeyPress,
-            ariaLabel: isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay,
+            ariaLabel: currentPlayingState ? playButtonAriaLabelPause : playButtonAriaLabelPlay,
             className: customPlayButtonClassName,
             onPlayClassName,
             onPauseClassName,
@@ -390,21 +388,19 @@ const VideoPlayer = memo<Props>(({
       ) : (
         // Only render button if current state has an icon to show
         (() => {
-          const currentIcon = isPlaying ? pauseIcon : playIcon;
-          const hasCurrentIcon = currentIcon !== "none";
-
-          return hasCurrentIcon && (
+          const currentIcon = currentPlayingState ? pauseIcon : playIcon;
+          return currentIcon !== "none" && (
             <button
               className={clsx(styles.playButton, playButtonClassName)}
               onClick={(e) => {
-                e.stopPropagation(); // Prevent container click handler
+                e.stopPropagation();
                 togglePlay();
               }}
               onKeyDown={handleKeyPress}
               type="button"
-              aria-label={isPlaying ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
+              aria-label={currentPlayingState ? playButtonAriaLabelPause : playButtonAriaLabelPlay}
             >
-              {isPlaying ? (
+              {currentPlayingState ? (
                 pauseIcon || (
                   <svg
                     width="24"

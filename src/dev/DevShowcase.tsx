@@ -246,6 +246,51 @@ const DevShowcase: React.FC = () => {
         </section>
 
         <section className="showcase-section">
+          <h2>External State Management</h2>
+          <p>Control video playback from external state with callbacks for synchronization</p>
+
+          <div className="custom-icons-grid">
+            <div className="player-demo">
+              <h3>External Control with Callbacks</h3>
+              <p>External state controls video, callbacks sync state</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playing={false} // This will be controlled externally
+                  onPlay={() => console.log('Video started')}
+                  onPause={() => console.log('Video paused')}
+                  onEnded={() => console.log('Video ended')}
+                />
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                  <small>Check console for callback events</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="player-demo">
+              <h3>State Management Integration</h3>
+              <p>Perfect for Redux, Zustand, or Context</p>
+              <div className="player-container">
+                <VideoPlayer
+                  src={sampleVideoUrl}
+                  thumbnailSrc={sampleThumbnail}
+                  size={180}
+                  playing={false}
+                  onPlay={() => console.log('State: PLAYING')}
+                  onPause={() => console.log('State: PAUSED')}
+                  onEnded={() => console.log('State: ENDED')}
+                />
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                  <small>Use with useState, Redux, etc.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="showcase-section">
           <h2>Custom Play Button</h2>
           <p>Custom play button with hiding behavior - hides when pauseIcon is set to "none"</p>
           <div className="custom-icons-grid">
