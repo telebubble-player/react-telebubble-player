@@ -14,12 +14,12 @@ While it works and has some cool features, **it's not recommended for production
 
 **Use at your own risk** - but feel free to fork, modify, and make it your own! 🚀
 
-## 🎉 What's New in v0.5.0
+## 🎉 What's New in v0.5.1
 
 - **🎮 External State Management** - `playing` prop for complete external control
 - **📞 State Callbacks** - `onPlay`, `onPause`, `onEnded` for state synchronization
-- **🔄 Bidirectional Control** - External state becomes single source of truth
-- **🧹 Simplified Code** - Cleaner implementation with better separation of concerns
+- **🔄 Single Source of Truth** - External state takes precedence when provided
+- **🧹 Simplified & Cleaner Code** - Better maintainability and performance
 
 ## 🎉 What's New in v0.4.0
 
